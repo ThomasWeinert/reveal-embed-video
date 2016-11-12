@@ -1,0 +1,55 @@
+video.live-video {
+  position: fixed;
+  z-index: 12;
+  left: 5%;
+  top:  5%;
+  width: 25%;
+  height: auto;
+  transition: width ease 1s, height ease 1s;
+  border: 3px solid #888 !important;
+  box-shadow: 3px 3px 3px #000;
+}
+
+video.live-video.blank {
+  display: none;
+}
+
+video.live-video.big {
+  width: 90%;
+  max-height: 90%;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+video.live-video.small {
+  width: 15%;
+  max-height: 25%;
+}
+
+video.live-video.top-right {
+  right: 5%;
+  top: 5%;
+  left: auto;
+  bottom: auto;
+}
+
+video.live-video.top-left {
+  left: 5%;
+  top:  5%;
+  right: auto;
+  bottom: auto;
+}
+
+video.live-video.bottom-right {
+  right:  5%;
+  bottom: 5%;
+  left: auto;
+  top: auto;
+}
+
+video.live-video.bottom-left {
+  left:   5%;
+  bottom: 5%;
+  right: auto;
+  top: auto;
+}
