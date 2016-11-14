@@ -35,7 +35,7 @@
             var nodeVideoClass = element.getAttribute('data-video');
             if (!nodeVideoClass && document.evaluate) {
                 nodeVideoClass = document.evaluate(
-                  "string(ancestor::*/@data-video)", element, null, XPathResult.STRING_TYPE
+                  "string(ancestor::*/@data-video)", element, null, XPathResult.STRING_TYPE, null
                 ).stringValue;
                 element.setAttribute("data-video", nodeVideoClass || "blank");
             }
@@ -137,3 +137,4 @@
         .catch(mediaError);
 
 })();
+
