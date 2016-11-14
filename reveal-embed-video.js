@@ -2,21 +2,51 @@
 
 
 (function() {
+    var config = Reveal.getConfig();
+    var options = config["embed-video"] || {};
+    options.path = options.path || scriptPath() || 'plugin/reveal-embed-video';
+
+    var resource = document.createElement("link");
+    resource.rel = "stylesheet";
+    resource.href = options.path + "/reveal-embed-video.css";
+    document.querySelector("head").appendChild(resource);
+
+    var identifierClass = "live-video";
+
     function stopVideo(video) {
         video.removeAttribute("src");
-        video.className = "blank";
+        video.className = identifierClass + " blank";
         video.load();
     }
 
     function startVideo(newClass, video, videoStream) {
-        video.src = videoStream;
-        video.className = newClass;
-        video.play();
+        if (video.src !== videoStream) {
+            video.pause();
+            video.src = videoStream;
+        }
+        video.className = identifierClass + ' ' + newClass;
+        if (!video.playing) {
+            video.play();
+        }
+    }
+
+    function getVideoClass(element) {
+        if (element instanceof Element) {
+            var nodeVideoClass = element.getAttribute('data-video');
+            if (!nodeVideoClass && document.evaluate) {
+                nodeVideoClass = document.evaluate(
+                  "string(ancestor::*/@data-video)", element, null, XPathResult.STRING_TYPE
+                ).stringValue;
+                element.setAttribute("data-video", nodeVideoClass || "blank");
+            }
+            return (nodeVideoClass && nodeVideoClass !== "blank") ? nodeVideoClass : false;
+        }
+        return false;
     }
 
     function slideChanged(previous, current, video, stream) {
-        var oldVideoClass = previous && previous.getAttribute("data-video");
-        var newVideoClass = current.getAttribute("data-video");
+        var oldVideoClass = getVideoClass(previous);
+        var newVideoClass = getVideoClass(current);
 
         if (oldVideoClass && !newVideoClass) {
             stopVideo(video);
@@ -56,6 +86,21 @@
                 setup(stream);
             });
         }
+    }
+
+    function scriptPath() {
+        // obtain plugin path from the script element
+        var path;
+        var end = -("/reveal-embed-video.js".length);
+        if (document.currentScript) {
+            path = document.currentScript.src.slice(0, end);
+        } else {
+            var scriptTag = document.querySelector('script[src$="/reveal-embed-video.js"]');
+            if (scriptTag) {
+                path = sel.src.slice(0, end);
+            }
+        }
+        return path;
     }
 
 
