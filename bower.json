@@ -1,0 +1,16 @@
+{
+  "name": "reveal-embed-video",
+  "version": "1.0",
+  "homepage": "https://github.com/pragdave/reveal-embed-video",
+  "authors": [
+    "Dave Thomas"
+  ],
+  "description": "Embed local video in a reveal.js presentation",
+  "keywords": [
+    "reveal",
+    "video"
+  ],
+  "ignore": [
+    "**/.*"
+  ]
+}
