@@ -5,20 +5,30 @@ video.live-video {
   top:  5%;
   width: 25%;
   height: auto;
-  transition: width ease 1s, height ease 1s;
+  transition:
+    width ease-in-out 1s,
+    height ease-in-out 1s,
+    border 1s ease 1s,
+    box-shadow 1s ease 1s;
   border: 3px solid #888 !important;
   box-shadow: 3px 3px 3px #000;
 }
 
-video.live-video.blank {
+/* show the video element only if the stream if active */
+video.live-video:not([data-enabled]) {
   display: none;
 }
 
 video.live-video.big {
   width: 90%;
   max-height: 90%;
-  border: none !important;
-  box-shadow: none !important;
+  border: 3px solid transparent !important;
+  box-shadow: 3px 3px 3px transparent !important;
+  transition:
+    width ease-in-out 2s,
+    height ease-in-out 2s,
+    border 0s,
+    box-shadow 0s;
 }
 
 video.live-video.small {
