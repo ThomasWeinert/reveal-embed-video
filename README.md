@@ -8,7 +8,7 @@ slides, in any position (including full screen).
 
 ## Demo
 
-[Live Demo](https://rawgit.com/ThomasWeinert/reveal-embed-video/master/example/index.html)
+[Live Demo](http://thomas.weinert.info/reveal-embed-video/example/index.html)
 
 
 ## Usage
