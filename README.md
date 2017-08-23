@@ -109,8 +109,8 @@ presentation using a local web server (such as `npm start`).
 
 ## Authors
 
-Thomas Weinert, thomas@weinert.info (current maintainer)
-Dave Thomas, @pragdave, dave@pragdave.me (original author)
+* Thomas Weinert, thomas@weinert.info (current maintainer)
+* Dave Thomas, @pragdave, dave@pragdave.me (original author)
 
 ## License
 
