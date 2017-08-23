@@ -94,8 +94,9 @@ toggle it.
 
 #### persistent
 
-Keep the stream open (the camera active) after opening it once. If it is disabled
-the plugin will deactivate the camera if the video is not used.
+Keep the stream open (the camera active) after opening it once. If it is enabled
+the plugin will keep the camera on even if the video is not used. This avoids repeat permission
+request dialogs.
 
 #### path 
 
