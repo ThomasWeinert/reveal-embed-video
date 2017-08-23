@@ -1,7 +1,7 @@
 # Embed Local Video in a Reveal Presentation
 
-A simple reveal.js plugin that lets you embed video from local sources
-(such as a webcam) on a Reveal presentation.
+A simple [reveal.js](https://github.com/hakimel/reveal.js) plugin that lets you embed video from local sources
+(such as a webcam) on a presentation.
 
 I use this when giving online talks. It lets me put myself on top of
 slides, in any position (including full screen).
@@ -22,7 +22,7 @@ slides, in any position (including full screen).
 </div>  
 ```
 
-The `data-video` attribute contains as class name. If a slide
+The `data-video` attribute contains class names. If a slide
 does not have it the plugin looks at its ancestor nodes. 
 
 The default classes are:
@@ -103,11 +103,11 @@ Most modern browsers will not allow local media devices to be opened
 from `file://` pages. To use this locally, you need to serve your
 presentation using a local web server (such as `npm start`).
 
+## Authors
 
-## Author
-
-Dave Thomas, @pragdave, dave@pragdave.me
+Thomas Weinert, thomas@weinert.info (current maintainer)
+Dave Thomas, @pragdave, dave@pragdave.me (original author)
 
 ## License
 
-See LICENSE.md
+MIT, see [LICENSE.md](LICENSE.md)

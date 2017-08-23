@@ -1,0 +1,32 @@
+<html>
+<head>
+  <title>Embed Local Video Example</title>
+  <link rel="stylesheet" href="bower_components/reveal.js/css/reveal.css">
+  <link rel="stylesheet" href="bower_components/reveal.js/css/theme/black.css">
+</head>
+<body>
+
+<div class="reveal" data-video="top-right">
+  <div class="slides">
+    <section>Press [C] to toggle camera!<br>Click the video image to switch input.</section>
+    <section data-video="top-left">different position</section>
+    <section data-video="top-left big">big</section>
+    <section data-video="top-left small">small</section>
+    <section data-video="false">disabled</section>
+    <section>enabled again</section>
+  </div>
+</div>
+
+<script src="bower_components/reveal.js/lib/js/head.min.js"></script>
+<script src="bower_components/reveal.js/js/reveal.js"></script>
+<script>
+  Reveal.initialize(
+      {
+          dependencies: [
+              { src: '../reveal-embed-video.js' }
+          ]
+      }
+  );
+</script>
+</body>
+</html>

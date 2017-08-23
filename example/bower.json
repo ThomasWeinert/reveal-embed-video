@@ -1,0 +1,7 @@
+{
+  "name": "reveal-embed-video-example",
+  "private": true,
+  "dependencies": {
+    "reveal.js": "^3.5.0"
+  }
+}
