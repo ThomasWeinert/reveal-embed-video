@@ -205,7 +205,8 @@
             'string(ancestor::*/@data-video)',
             element,
             null,
-            XPathResult.STRING_TYPE
+            XPathResult.STRING_TYPE,
+            null
         ).stringValue;
         element.setAttribute('data-video', nodeVideoClass || 'false');
       }
