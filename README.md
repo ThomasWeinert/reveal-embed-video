@@ -107,6 +107,14 @@ Most modern browsers will not allow local media devices to be opened
 from `file://` pages. To use this locally, you need to serve your
 presentation using a local web server (such as `npm start`).
 
+### IE 
+
+Doesn't work.
+
+### Edge
+
+Works if you add [a shim](https://github.com/webrtc/adapter). 
+
 ## Authors
 
 * Thomas Weinert, thomas@weinert.info (current maintainer)

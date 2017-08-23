@@ -119,7 +119,7 @@
             }.bind(this)
         )
         .catch(
-            function() {
+            function(error) {
               console.log('getUserMedia error: ', error);
               this.__status = LiveStream.STATUS_ERROR;
             }.bind(this)
@@ -200,16 +200,12 @@
   LiveVideo.prototype.getVideoClass = function(element) {
     if (element instanceof Element) {
       var nodeVideoClass = element.getAttribute('data-video');
-      if (!nodeVideoClass && document.evaluate) {
-        nodeVideoClass = document.evaluate(
-            'string(ancestor::*/@data-video)',
-            element,
-            null,
-            XPathResult.STRING_TYPE,
-            null
-        ).stringValue;
-        element.setAttribute('data-video', nodeVideoClass || 'false');
-      }
+      var node = element;
+      do {
+        nodeVideoClass = node.getAttribute('data-video');
+        node = node.parentNode;
+      } while (!nodeVideoClass && node);
+      element.setAttribute('data-video', nodeVideoClass || 'false');
       return (
           nodeVideoClass &&
           nodeVideoClass !== 'false' &&
