@@ -23,7 +23,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="EmbedVideo.LiveStream.html">LiveStream</a><ul class='methods'><li data-type='method'><a href="EmbedVideo.LiveStream.html#__create">__create</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#__destroy">__destroy</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#__enable">__enable</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#isActive">isActive</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#next">next</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#start">start</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#stop">stop</a></li></ul></li><li><a href="EmbedVideo.Plugin.html">Plugin</a><ul class='methods'><li data-type='method'><a href="EmbedVideo.Plugin.html#getVideoClass">getVideoClass</a></li><li data-type='method'><a href="EmbedVideo.Plugin.html#toggle">toggle</a></li><li data-type='method'><a href="EmbedVideo.Plugin.html#update">update</a></li></ul></li></ul><h3>Namespaces</h3><ul><li><a href="EmbedVideo.html">EmbedVideo</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="EmbedVideo.LiveStream.html">LiveStream</a><ul class='methods'><li data-type='method'><a href="EmbedVideo.LiveStream.html#_create">_create</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#_destroy">_destroy</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#_enable">_enable</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#isActive">isActive</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#next">next</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#start">start</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#stop">stop</a></li></ul></li><li><a href="EmbedVideo.Plugin.html">Plugin</a><ul class='methods'><li data-type='method'><a href="EmbedVideo.Plugin.html#getVideoClass">getVideoClass</a></li><li data-type='method'><a href="EmbedVideo.Plugin.html#toggle">toggle</a></li><li data-type='method'><a href="EmbedVideo.Plugin.html#update">update</a></li></ul></li></ul><h3>Namespaces</h3><ul><li><a href="EmbedVideo.html">EmbedVideo</a><ul class='methods'><li data-type='method'><a href="EmbedVideo.html#.getScriptPath">getScriptPath</a></li></ul></li></ul>
 </nav>
 
 <div id="main">
@@ -43,7 +43,7 @@
  * reveal.js slides.
  *
  * @namespace EmbedVideo
- * @author ThomasWeinert
+ * @author Thomas Weinert
  * @license MIT
  * @see {@link http://thomas.weinert.info/reveal-embed-video/|GitHub} for documentation, bug reports and more.
  */
@@ -54,345 +54,413 @@
  * Plugin initialization
  * @function
  */
-(function() {
+(function () {
 
-  /**
-   * @param {HTMLVideoElement} video
-   * @param {boolean} persistent Keep stream for disabled video
-   * @constructor
-   * @memberOf EmbedVideo
-   */
-  var LiveStream = function(video, persistent) {
-    this.__video = video;
-    this.__stream = null;
-    this.__status = LiveStream.STATUS.DISABLED;
-    this.__persistent = persistent;
-    this.__devices = null;
-    this.__currentDeviceId = null;
-  };
-
-  /**
-   * @typedef {number} LiveStream.STATUS
-   */
-
-  /**
-   * @enum {LiveStream.STATUS}
-   */
-  LiveStream.STATUS = {
-    DISABLED: 0,
-    PENDING: 1,
-    ACTIVE: 2,
-    ERROR: -1
-  };
-
-  /**
-   * Start streaming, activate an existing stream or create a new one.
-   * If here is an active stream this call will do nothing.
-   */
-  LiveStream.prototype.start = function() {
-    if (this.__status === LiveStream.STATUS.DISABLED) {
-      if (this.__stream) {
-        this.__enable();
-      } else {
-        this.__create();
-      }
-    }
-  };
-
-  /**
-   * Check if the stream is active
-   * @returns {boolean}
-   */
-  LiveStream.prototype.isActive = function() {
-    return this.__status === LiveStream.STATUS.ACTIVE;
-  };
-
-  /**
-   * Stop video stream and disable video
-   */
-  LiveStream.prototype.stop = function() {
-    if (this.__status === LiveStream.STATUS.ACTIVE) {
-      this.__destroy();
-    }
-  };
-
-  /**
-   * Switch to the next video device
-   */
-  LiveStream.prototype.next = function() {
-    var deviceId;
-    if (
-        this.__devices instanceof Array &amp;&amp;
-        this.__devices.length > 1
-    ) {
-      deviceId = this.__devices[0];
-      if (this.__currentDeviceId) {
-        var index = this.__devices.indexOf(this.__currentDeviceId);
-        if (index >= 0 &amp;&amp; index + 1 &lt; this.__devices.length) {
-          deviceId = this.__devices[index + 1];
-        }
-      }
-    }
-    if (deviceId &amp;&amp; deviceId !== this.__currentDeviceId) {
-      this.__currentDeviceId = deviceId;
-      if (this.__stream) {
-        this.__stream.getTracks().forEach(
-            function(track) { track.stop(); }
-        );
-        this.__stream = null;
-      }
-      if (this.isActive()) {
-        this.__create();
-      }
-    }
-  };
-
-  /**
-   * Activate video after Reveal is ready, wait with video activation until then
-   * @private
-   */
-  LiveStream.prototype.__enable = function() {
-    if (!Reveal.isReady()) {
-      Reveal.addEventListener(
-          'ready',
-          this.__enable().bind(this)
-      );
-    } else if (this.__stream) {
-      var video = this.__video;
-      if (video.srcObject !== this.__stream) {
-        video.pause();
-        video.srcObject = this.__stream;
-      }
-      video.setAttribute('data-enabled', 'true');
-      if (!video.playing) {
-        video.play();
-      }
-      this.__status = LiveStream.STATUS.ACTIVE;
-    }
-  };
-
-  /**
-   * Fetch device list and create user media stream
-   * @private
-   */
-  LiveStream.prototype.__create = function() {
-    var constraints = {
-      audio: false,
-      video: true
+    /**
+     * @param {HTMLVideoElement} video
+     * @param {boolean} persistent Keep stream for disabled video
+     * @constructor
+     * @memberOf EmbedVideo
+     */
+    var LiveStream = function (video, persistent) {
+        /**
+         * @type {HTMLVideoElement}
+         * @private
+         */
+        this._video = video;
+        /**
+         * @type {?(MediaStream|MediaSource|Blob|File)}
+         * @private
+         */
+        this._stream = null;
+        /**
+         * @type {EmbedVideo.LiveStream.STATUS}
+         * @private
+         */
+        this._status = LiveStream.STATUS.DISABLED;
+        /**
+         * @type {boolean}
+         * @private
+         */
+        this._persistent = persistent;
+        /**
+         * @type {string[]}
+         * @private
+         */
+        this._devices = null;
+        /**
+         * @type {?string}
+         * @private
+         */
+        this._currentDeviceId = null;
     };
-    this.__status = LiveStream.STATUS.PENDING;
-    if (null === this.__devices) {
-      this.__devices = [];
-      navigator
-          .mediaDevices
-          .enumerateDevices()
-          .then(
-              function(devices) {
-                for (var i = 0, c = devices.length; i &lt; c; i++) {
-                  if (devices[i].kind.toLowerCase() === 'videoinput') {
-                    this.__devices.push(devices[i].deviceId);
-                  }
-                }
-              }.bind(this)
-          );
-    }
-    if (this.__currentDeviceId) {
-      constraints.video = { deviceId: this.__currentDeviceId };
-    }
-    navigator
-        .mediaDevices
-        .getUserMedia(constraints)
-        .then(
-            function(stream) {
-              this.__stream = stream;
-              this.__currentDeviceId = stream.getVideoTracks()[0].getSettings().deviceId;
-              this.__enable();
-            }.bind(this)
-        )
-        .catch(
-            function(error) {
-              console.log('getUserMedia error: ', error);
-              this.__status = LiveStream.STATUS.ERROR;
-            }.bind(this)
-        );
-  };
 
-  /**
-   * Pause video, remove enabled status and stop stream
-   * @private
-   * @returns {void}
-   */
-  LiveStream.prototype.__destroy = function() {
-    var video = this.__video;
-    if (video instanceof HTMLVideoElement) {
-      if (video.playing) {
-        video.pause();
-      }
-      video.srcObject = null;
-      video.removeAttribute('data-enabled');
-      video.load();
-      if (this.__stream &amp;&amp; !this.__persistent) {
-        this.__stream.getTracks().forEach(
-            function(track) { track.stop(); }
-        );
-        this.__stream = null;
-      }
-    }
-    this.__status = LiveStream.STATUS.DISABLED;
-  };
+    /**
+     * @typedef {number} EmbedVideo.LiveStream.STATUS
+     */
 
-  /**
-   * @param {EmbedVideo.Plugin.Options} options
-   * @constructor
-   * @memberOf EmbedVideo
-   */
-  var Plugin = function(options) {
     /**
-     * Plugin be enabled
-     * @type {boolean}
-     * @private
+     * @enum {EmbedVideo.LiveStream.STATUS}
      */
-    this.__enabled = options.enabled;
-    /**
-     * Shortcuts registered
-     * @type {boolean}
-     * @private
-     */
-    this.__registered = false;
-    var resource = document.createElement('link');
-    resource.rel = 'stylesheet';
-    resource.href = options.path + '/reveal-embed-video.css';
-    document.querySelector('head').appendChild(resource);
-    /**
-     * Class to identify the video element (avoid conflicts with other videos)
-     * @type {string}
-     * @private
-     */
-    this.__identfierClass = 'live-video';
-    /**
-     * @type {HTMLVideoElement}
-     * @private
-     */
-    this.__video = document.querySelector('.reveal').appendChild(
-        document.createElement('video')
-    );
-    this.__video.setAttribute('class', this.__identfierClass);
-    this.__video.addEventListener(
-        'click',
-        function() {
-          this.__stream.next();
-        }.bind(this)
-    );
-    /**
-     * @type {LiveStream}
-     * @private
-     */
-    this.__stream = new LiveStream(this.__video, options.persistent);
-    Reveal.addEventListener('ready', this.update.bind(this));
-    Reveal.addEventListener('slidechanged', this.update.bind(this));
-  };
+    LiveStream.STATUS = {
+        DISABLED: 0,
+        PENDING: 1,
+        ACTIVE: 2,
+        ERROR: -1
+    };
 
-  /**
-   * Toggle the plugin between enabled/disabled
-   */
-  Plugin.prototype.toggle = function() {
-    this.__enabled = !this.__enabled;
-    this.update();
-    return this.__enabled;
-  };
-
-  /**
-   * Update plugin status in DOM and Reveal
-   * @returns {void}
-   */
-  Plugin.prototype.update = function() {
-    if (!this.__registered) {
-      this.__registered = true;
-      Reveal.registerKeyboardShortcut('C', 'Toggle speaker camera');
-      Reveal.configure(
-          {
-            keyboard: {
-              67: this.toggle.bind(this)
+    /**
+     * Start streaming, activate an existing stream or create a new one.
+     * If here is an active stream this call will do nothing.
+     */
+    LiveStream.prototype.start = function () {
+        if (this._status === LiveStream.STATUS.DISABLED) {
+            if (this._stream) {
+                this._enable();
+            } else {
+                this._create();
             }
-          }
-      );
-    }
-    var newVideoClass = this.getVideoClass(Reveal.getCurrentSlide());
-    var enabled = this.__enabled &amp;&amp; newVideoClass;
-    if (this.__stream.isActive() &amp;&amp; !enabled) {
-      this.__video.setAttribute('class', this.__identfierClass);
-      this.__stream.stop();
-    }
-    if (enabled) {
-      this.__video.setAttribute('class', this.__identfierClass + ' ' + newVideoClass);
-      this.__stream.start();
-    }
-  };
+        }
+    };
 
-  /**
-   * Fetch the slide specific style class for the video element
-   * from the `data-video` attribute.
-   *
-   * @param {HTMLElement} element
-   * @returns {(string|boolean)}
-   */
-  Plugin.prototype.getVideoClass = function(element) {
-    if (element instanceof Element) {
-      var nodeVideoClass = element.getAttribute('data-video');
-      /**
-       * @type {HTMLElement|ParentNode}
-       */
-      var node = element;
-      do {
-        nodeVideoClass = node.getAttribute('data-video');
-        node = node.parentNode;
-      } while (!nodeVideoClass &amp;&amp; node);
-      element.setAttribute('data-video', nodeVideoClass || 'false');
-      return (
-          nodeVideoClass &amp;&amp;
-          nodeVideoClass !== 'false' &amp;&amp;
-          nodeVideoClass !== 'blank'
-      ) ? nodeVideoClass : false;
-    }
-    return false;
-  };
+    /**
+     * Check if the stream is active
+     * @returns {boolean}
+     */
+    LiveStream.prototype.isActive = function () {
+        return this._status === LiveStream.STATUS.ACTIVE;
+    };
 
-  /**
-   * obtain plugin path from the script element
-   * @returns {string}
-   */
-  var getScriptPath = function() {
-    var path;
-    var end = -('/reveal-embed-video.js'.length);
-    if (document.currentScript &amp;&amp; document.currentScript['src']) {
-      path = document.currentScript['src'].slice(0, end);
-    } else {
-      var scriptTag = document.querySelector('script[src$="/reveal-embed-video.js"]');
-      if (scriptTag) {
-        path = scriptTag.src.slice(0, end);
-      }
-    }
-    return path;
-  };
+    /**
+     * Stop video stream and disable video
+     * @returns {void}
+     */
+    LiveStream.prototype.stop = function () {
+        if (this._status === LiveStream.STATUS.ACTIVE) {
+            this._destroy();
+        }
+    };
 
-  var config = Reveal.getConfig();
+    /**
+     * Switch to the next video device
+     * @returns {void}
+     */
+    LiveStream.prototype.next = function () {
+        var deviceId = null;
+        if (
+            this._devices instanceof Array &amp;&amp;
+            this._devices.length > 1
+        ) {
+            deviceId = this._devices[0];
+            if (this._currentDeviceId) {
+                var index = this._devices.indexOf(this._currentDeviceId);
+                if (index >= 0 &amp;&amp; index + 1 &lt; this._devices.length) {
+                    deviceId = this._devices[index + 1];
+                }
+            }
+        }
+        if (deviceId &amp;&amp; deviceId !== this._currentDeviceId) {
+            this._currentDeviceId = deviceId;
+            if (this._stream) {
+                this._stream.getTracks().forEach(
+                    function (track) {
+                        track.stop();
+                    }
+                );
+                this._stream = null;
+            }
+            if (this.isActive()) {
+                this._create();
+            }
+        }
+    };
 
-  /**
-   * @typedef EmbedVideo.Plugin.Options
-   * @property {boolean} enabled
-   * @property {boolean} persistent
-   * @property {string} path
-   */
+    /**
+     * Activate video after Reveal is ready, wait with video activation until then
+     * @private
+     * @returns {void}
+     */
+    LiveStream.prototype._enable = function () {
+        var video;
+        if (!Reveal.isReady()) {
+            Reveal.addEventListener(
+                'ready',
+                /**
+                 * @memberof EmbedVideo.LiveStream.prototype
+                 */
+                function() {
+                    this._enable()
+                }.bind(this)
+            );
+        } else if (this._stream) {
+            video = this._video;
+            if (video.srcObject !== this._stream) {
+                video.pause();
+                video.srcObject = this._stream;
+            }
+            video.setAttribute('data-enabled', 'true');
+            if (!video.playing) {
+                video.play();
+            }
+            this._status = LiveStream.STATUS.ACTIVE;
+        }
+    };
 
-  /**
-   * @type {EmbedVideo.Plugin.Options}
-   */
-  var options = config['embed-video'] || {};
-  options.enabled = !!options.enabled; // enable live video (toggle with [C])
-  options.persistent = !!options.persistent; // keep camera active if hidden
-  options.path = options.path || getScriptPath() || 'plugin/reveal-embed-video';
+    /**
+     * Fetch device list and create user media stream
+     * @private
+     * @returns {void}
+     */
+    LiveStream.prototype._create = function () {
+        var constraints = {
+            audio: false,
+            video: true
+        };
+        this._status = LiveStream.STATUS.PENDING;
+        if (null === this._devices) {
+            this._devices = [];
+            navigator
+                .mediaDevices
+                .enumerateDevices()
+                .then(
+                    /**
+                     * @param {Array.&lt;MediaStream|MediaSource|Blob|File>} devices
+                     * @memberof EmbedVideo.LiveStream.prototype
+                     */
+                    function (devices) {
+                        for (var i = 0, c = devices.length; i &lt; c; i++) {
+                            if (devices[i].kind.toLowerCase() === 'videoinput') {
+                                this._devices.push(devices[i].deviceId);
+                            }
+                        }
+                    }.bind(this)
+                );
+        }
+        if (this._currentDeviceId) {
+            constraints.video = {deviceId: this._currentDeviceId};
+        }
+        navigator
+            .mediaDevices
+            .getUserMedia(constraints)
+            .then(
+                /**
+                 * @memberof EmbedVideo.LiveStream.prototype
+                 */
+                function (stream) {
+                    this._stream = stream;
+                    this._currentDeviceId = stream.getVideoTracks()[0].getSettings().deviceId;
+                    this._enable();
+                }.bind(this)
+            )
+            .catch(
+                /**
+                 * @memberof EmbedVideo.LiveStream.prototype
+                 */
+                function (error) {
+                    console.log('getUserMedia error: ', error);
+                    this._status = LiveStream.STATUS.ERROR;
+                }.bind(this)
+            );
+    };
 
-  new Plugin(options);
+    /**
+     * Pause video, remove enabled status and stop stream
+     * @private
+     * @returns {void}
+     */
+    LiveStream.prototype._destroy = function () {
+        var video = this._video;
+        if (video instanceof HTMLVideoElement) {
+            if (video.playing) {
+                video.pause();
+            }
+            video.srcObject = null;
+            video.removeAttribute('data-enabled');
+            video.load();
+            if (this._stream &amp;&amp; !this._persistent) {
+                this._stream.getTracks().forEach(
+                    function (track) {
+                        track.stop();
+                    }
+                );
+                this._stream = null;
+            }
+        }
+        this._status = LiveStream.STATUS.DISABLED;
+    };
+
+    /**
+     * @param {EmbedVideo.Plugin.Options} options
+     * @constructor
+     * @memberOf EmbedVideo
+     */
+    var Plugin = function (options) {
+        var style, onUpdateRequired;
+        /**
+         * Plugin be enabled
+         * @type {boolean}
+         * @private
+         */
+        this._isEnabled = options.enabled;
+        /**
+         * Keyboard shortcut registered
+         * @type {boolean}
+         * @private
+         */
+        this._isRegistered = false;
+        /**
+         * CSS class to identify the video element (avoid conflicts with other videos)
+         * @type {string}
+         * @private
+         */
+        this._identfierClass = 'live-video';
+        /**
+         * @type {HTMLVideoElement}
+         * @private
+         */
+        this._video = document.querySelector('.reveal').appendChild(
+            document.createElement('video')
+        );
+        this._video.setAttribute('class', this._identfierClass);
+        this._video.addEventListener(
+            'click',
+            /**
+             * @memberof EmbedVideo.LiveStream.prototype
+             */
+            function () {
+                this._stream.next();
+            }.bind(this)
+        );
+        /**
+         * @type {EmbedVideo.LiveStream}
+         * @private
+         */
+        this._stream = new LiveStream(this._video, options.persistent);
+
+        style = document.createElement('link');
+        style.rel = 'stylesheet';
+        style.href = options.path + '/reveal-embed-video.css';
+        document.querySelector('head').appendChild(style);
+
+        /**
+         * @memberOf EmbedVideo.Plugin.prototype
+         */
+        onUpdateRequired = function() {
+            this.update();
+        }.bind(this);
+        Reveal.addEventListener('ready', onUpdateRequired);
+        Reveal.addEventListener('slidechanged', onUpdateRequired);
+    };
+
+    /**
+     * Toggle the plugin between enabled/disabled
+     * @returns {boolean}
+     */
+    Plugin.prototype.toggle = function () {
+        this.update(this._isEnabled = !this._isEnabled);
+        return this._isEnabled;
+    };
+
+    /**
+     * Update plugin status in DOM and Reveal
+     *
+     * Registers the Key `C` (camera) to enable/disable the plugin
+     *
+     * @returns {void}
+     */
+    Plugin.prototype.update = function () {
+        var newVideoClass, enable;
+        if (!this._isRegistered) {
+            this._isRegistered = true;
+            Reveal.registerKeyboardShortcut('C', 'Toggle speaker camera');
+            Reveal.configure(
+                {
+                    keyboard: {
+                        67: this.toggle.bind(this)
+                    }
+                }
+            );
+        }
+        newVideoClass = this.getVideoClass(Reveal.getCurrentSlide());
+        enable = this._isEnabled &amp;&amp; newVideoClass;
+        if (this._stream.isActive() &amp;&amp; !enable) {
+            this._video.setAttribute('class', this._identfierClass);
+            this._stream.stop();
+        }
+        if (enable) {
+            this._video.setAttribute('class', this._identfierClass + ' ' + newVideoClass);
+            this._stream.start();
+        }
+    };
+
+    /**
+     * Fetch the slide specific style class for the video element
+     * from the `data-video` attribute.
+     *
+     * @param {HTMLElement} element
+     * @returns {?string}
+     */
+    Plugin.prototype.getVideoClass = function (element) {
+        if (element instanceof Element) {
+            var nodeVideoClass = element.getAttribute('data-video');
+            /**
+             * @type {HTMLElement|ParentNode}
+             */
+            var node = element;
+            do {
+                nodeVideoClass = node.getAttribute('data-video');
+                node = node.parentNode;
+            } while (!nodeVideoClass &amp;&amp; node);
+            element.setAttribute('data-video', nodeVideoClass || 'false');
+            return (
+                nodeVideoClass &amp;&amp;
+                nodeVideoClass !== 'false' &amp;&amp;
+                nodeVideoClass !== 'blank'
+            ) ? nodeVideoClass : null;
+        }
+        return null;
+    };
+
+    /**
+     * obtain plugin path from the script element
+     * @returns {string}
+     * @memberOf EmbedVideo
+     */
+    var getScriptPath = function () {
+        var path;
+        var end = -('/reveal-embed-video.js'.length);
+        if (document.currentScript &amp;&amp; document.currentScript['src']) {
+            path = document.currentScript['src'].slice(0, end);
+        } else {
+            var scriptTag = document.querySelector('script[src$="/reveal-embed-video.js"]');
+            if (scriptTag) {
+                path = scriptTag.src.slice(0, end);
+            }
+        }
+        return path;
+    };
+
+    /**
+     * @type {Object.&lt;string, *>}
+     */
+    var config = Reveal.getConfig();
+
+    /**
+     * @typedef EmbedVideo.Plugin.Options
+     * @property {boolean} enabled Enable the plugin on startup
+     * @property {boolean} persistent Keep stream active on disable
+     * @property {string} path Script path
+     */
+
+    /**
+     * @type {EmbedVideo.Plugin.Options}
+     */
+    var options = config['embed-video'] || {};
+    options.enabled = !!options.enabled; // enable live video (toggle with [C])
+    options.persistent = !!options.persistent; // keep camera active if hidden
+    options.path = options.path || getScriptPath() || 'plugin/reveal-embed-video';
+
+    new Plugin(options);
 
 })();
 </code></pre>
@@ -407,7 +475,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated at Sat Dec 15 2018 15:03:18 GMT+0100 (W. Europe Standard Time)
+    Documentation generated at Sat Dec 15 2018 20:47:18 GMT+0100 (W. Europe Standard Time)
 </footer>
 
 <script>prettyPrint();</script>
