@@ -1,0 +1,36 @@
+{
+  "name": "reveal-embed-video",
+  "description": "Embed local video in a reveal.js presentation",
+  "homepage": "http://thomas.weinert.info/reveal-embed-video/",
+  "keywords": [
+    "reveal",
+    "video",
+    "webcam",
+    "webinar"
+  ],
+  "authors": [
+    "Thomas Weinert <thomas@weinert.info>"
+  ],
+  "main": "reveal-embed-video.js",
+  "ignore": [
+    "**/.*",
+    "example/",
+    "docs/"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "generate-docs": "jsdoc --configure .jsdoc.json --verbose\n"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThomasWeinert/reveal-embed-video.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ThomasWeinert/reveal-embed-video/issues"
+  },
+  "devDependencies": {
+    "latodoc": "github:smeijer/latodoc"
+  }
+}

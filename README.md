@@ -8,7 +8,7 @@ slides, in any position (including full screen).
 
 ## Demo
 
-[Live Demo](http://thomas.weinert.info/reveal-embed-video/example/index.html)
+[Live Demo](https://thomas.weinert.info/reveal-embed-video/docs/example/index.html)
 
 
 ## Usage
@@ -67,7 +67,7 @@ the video to cycle trough them.
 
 There are several ways to install reveal_external:
 
-* The manual way: Save `reveal-embed-video.js` and `reveal-embed-video.js` into your 
+* The manual way: Save `reveal-embed-video.js` and `reveal-embed-video.css` into your 
   project structure
 * Install with bower: bower install reveal_embed_video
 
@@ -123,4 +123,4 @@ Works if you add [a shim](https://github.com/webrtc/adapter).
 
 ## License
 
-MIT, see [LICENSE.md](LICENSE.md)
+MIT

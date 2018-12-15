@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Home - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="EmbedVideo.LiveStream.html">LiveStream</a><ul class='methods'><li data-type='method'><a href="EmbedVideo.LiveStream.html#__create">__create</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#__destroy">__destroy</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#__enable">__enable</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#isActive">isActive</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#next">next</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#start">start</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#stop">stop</a></li></ul></li><li><a href="EmbedVideo.Plugin.html">Plugin</a><ul class='methods'><li data-type='method'><a href="EmbedVideo.Plugin.html#getVideoClass">getVideoClass</a></li><li data-type='method'><a href="EmbedVideo.Plugin.html#toggle">toggle</a></li><li data-type='method'><a href="EmbedVideo.Plugin.html#update">update</a></li></ul></li></ul><h3>Namespaces</h3><ul><li><a href="EmbedVideo.html">EmbedVideo</a></li></ul>
+</nav>
+
+<div id="main">
+    
+
+    
+
+
+
+    
+
+
+
+
+
+
+
+
+
+    
+
+
+    <section class="readme">
+        <article><h1>Embed Local Video in a Reveal Presentation</h1><p>A simple <a href="https://github.com/hakimel/reveal.js">reveal.js</a> plugin that lets you embed video from local sources
+(such as a webcam) on a presentation.</p>
+<p>I use this when giving online talks. It lets me put myself on top of
+slides, in any position (including full screen).</p>
+<h2>Demo</h2><p><a href="https://thomas.weinert.info/reveal-embed-video/docs/example/index.html">Live Demo</a></p>
+<h2>Usage</h2><pre class="prettyprint source lang-HTML"><code>&lt;div class=&quot;reveal&quot; data-video=&quot;small top-right&quot;>
+  &lt;section class=&quot;slides&quot;>
+    &lt;section>
+      ... regular slide
+    &lt;/section>
+    &lt;section data-video=&quot;big top-right&quot;>
+      ... slide with large video 
+    &lt;/section>
+  &lt;/section>
+&lt;/div>  </code></pre><p>The <code>data-video</code> attribute contains class names. If a slide
+does not have it the plugin looks at its ancestor nodes. </p>
+<p>The default classes are:</p>
+<ul>
+<li><code>big</code> = video width 90% of browser window</li>
+<li><code>small</code> = video width 15% of browser window</li>
+<li><code>top-left</code> = position top left corner</li>
+<li><code>top-right</code> = position top right corner</li>
+<li><code>bottom-left</code> = position bottom left corner</li>
+<li><code>bottom-right</code> = position bottom right corner</li>
+</ul>
+<p>If you set only a position the video width will be 25% of the browser
+window.</p>
+<p>You can define and use you own CSS classes to position/format the video element.
+The video element always has the class <code>live-video</code> to avoid conflict with other
+videos in your presentation.</p>
+<pre class="prettyprint source lang-CSS"><code>video.live-video.your-class {
+  /* your css definitions */
+}</code></pre><p>You can set the <code>data-video</code> attribute to <code>false</code> to disable the video.</p>
+<h3>Keyboard Shortcut</h3><p>Use the key <code>[C]</code> to enabled/disable the video. By default it will be disabled at 
+start. The <code>enabled</code> option can change this.</p>
+<h3>Switching Video Input</h3><p>If you have multiple video inputs (front ant rear camera) you can click on 
+the video to cycle trough them.</p>
+<h2>Installation</h2><p>There are several ways to install reveal_external:</p>
+<ul>
+<li>The manual way: Save <code>reveal-embed-video.js</code> and <code>reveal-embed-video.css</code> into your 
+project structure</li>
+<li>Install with bower: bower install reveal_embed_video</li>
+</ul>
+<h2>Configuration</h2><p>Add the plugin to the dependencies:</p>
+<pre class="prettyprint source"><code>dependencies: [
+    ...
+    { src: 'vendor/reveal-embed-video.js' },</code></pre><h3>Options</h3><pre class="prettyprint source"><code>'embed-video': {
+    enabled: false, // optional, default false
+    persistent: false, // optional, default false
+    path: '/path/to/plugin' // optional, default null
+}       </code></pre><h4>enabled</h4><p>Enable the video stream directly at startup. Pressing <code>[C]</code> will still allow you to 
+toggle it.</p>
+<h4>persistent</h4><p>Keep the stream open (the camera active) after opening it once. If it is enabled
+the plugin will keep the camera on even if the video is not used. This avoids repeat permission
+request dialogs.</p>
+<h4>path</h4><p>The path for the css file (<code>reveal-embed-vide.css</code>). The plugin will try to calculate that itself.</p>
+<h2>Limitations</h2><p>Most modern browsers will not allow local media devices to be opened
+from <code>file://</code> pages. To use this locally, you need to serve your
+presentation using a local web server (such as <code>npm start</code>).</p>
+<h3>IE</h3><p>Doesn't work.</p>
+<h3>Edge</h3><p>Works if you add <a href="https://github.com/webrtc/adapter">a shim</a>. </p>
+<h2>Authors</h2><ul>
+<li>Thomas Weinert, <a href="mailto:thomas@weinert.info">thomas@weinert.info</a> (current maintainer)</li>
+<li>Dave Thomas, @pragdave, <a href="mailto:dave@pragdave.me">dave@pragdave.me</a> (original author)</li>
+</ul>
+<h2>License</h2><p>MIT</p></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated at Sat Dec 15 2018 14:40:55 GMT+0100 (W. Europe Standard Time)
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

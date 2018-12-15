@@ -1,4 +1,44 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>reveal-embed-video.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="EmbedVideo.LiveStream.html">LiveStream</a><ul class='methods'><li data-type='method'><a href="EmbedVideo.LiveStream.html#__create">__create</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#__destroy">__destroy</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#__enable">__enable</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#isActive">isActive</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#next">next</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#start">start</a></li><li data-type='method'><a href="EmbedVideo.LiveStream.html#stop">stop</a></li></ul></li><li><a href="EmbedVideo.Plugin.html">Plugin</a><ul class='methods'><li data-type='method'><a href="EmbedVideo.Plugin.html#getVideoClass">getVideoClass</a></li><li data-type='method'><a href="EmbedVideo.Plugin.html#toggle">toggle</a></li><li data-type='method'><a href="EmbedVideo.Plugin.html#update">update</a></li></ul></li></ul><h3>Namespaces</h3><ul><li><a href="EmbedVideo.html">EmbedVideo</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">reveal-embed-video.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
  * reveal-embed-video.js is a plugin to include an live video stream (from a webcam) in
  * reveal.js slides.
  *
@@ -82,18 +122,18 @@
   LiveStream.prototype.next = function() {
     var deviceId;
     if (
-        this.__devices instanceof Array &&
+        this.__devices instanceof Array &amp;&amp;
         this.__devices.length > 1
     ) {
       deviceId = this.__devices[0];
       if (this.__currentDeviceId) {
         var index = this.__devices.indexOf(this.__currentDeviceId);
-        if (index >= 0 && index + 1 < this.__devices.length) {
+        if (index >= 0 &amp;&amp; index + 1 &lt; this.__devices.length) {
           deviceId = this.__devices[index + 1];
         }
       }
     }
-    if (deviceId && deviceId !== this.__currentDeviceId) {
+    if (deviceId &amp;&amp; deviceId !== this.__currentDeviceId) {
       this.__currentDeviceId = deviceId;
       if (this.__stream) {
         this.__stream.getTracks().forEach(
@@ -148,7 +188,7 @@
           .enumerateDevices()
           .then(
               function(devices) {
-                for (var i = 0, c = devices.length; i < c; i++) {
+                for (var i = 0, c = devices.length; i &lt; c; i++) {
                   if (devices[i].kind.toLowerCase() === 'videoinput') {
                     this.__devices.push(devices[i].deviceId);
                   }
@@ -191,7 +231,7 @@
       video.srcObject = null;
       video.removeAttribute('data-enabled');
       video.load();
-      if (this.__stream && !this.__persistent) {
+      if (this.__stream &amp;&amp; !this.__persistent) {
         this.__stream.getTracks().forEach(
             function(track) { track.stop(); }
         );
@@ -278,8 +318,8 @@
       );
     }
     var newVideoClass = this.getVideoClass(Reveal.getCurrentSlide());
-    var enabled = this.__enabled && newVideoClass;
-    if (this.__stream.isActive() && !enabled) {
+    var enabled = this.__enabled &amp;&amp; newVideoClass;
+    if (this.__stream.isActive() &amp;&amp; !enabled) {
       this.__video.setAttribute('class', this.__identfierClass);
       this.__stream.stop();
     }
@@ -306,11 +346,11 @@
       do {
         nodeVideoClass = node.getAttribute('data-video');
         node = node.parentNode;
-      } while (!nodeVideoClass && node);
+      } while (!nodeVideoClass &amp;&amp; node);
       element.setAttribute('data-video', nodeVideoClass || 'false');
       return (
-          nodeVideoClass &&
-          nodeVideoClass !== 'false' &&
+          nodeVideoClass &amp;&amp;
+          nodeVideoClass !== 'false' &amp;&amp;
           nodeVideoClass !== 'blank'
       ) ? nodeVideoClass : false;
     }
@@ -324,7 +364,7 @@
   var getScriptPath = function() {
     var path;
     var end = -('/reveal-embed-video.js'.length);
-    if (document.currentScript && document.currentScript['src']) {
+    if (document.currentScript &amp;&amp; document.currentScript['src']) {
       path = document.currentScript['src'].slice(0, end);
     } else {
       var scriptTag = document.querySelector('script[src$="/reveal-embed-video.js"]');
@@ -355,3 +395,22 @@
   new Plugin(options);
 
 })();
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated at Sat Dec 15 2018 14:40:55 GMT+0100 (W. Europe Standard Time)
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
