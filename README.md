@@ -6,9 +6,8 @@ A simple [reveal.js](https://github.com/hakimel/reveal.js) plugin that lets you 
 I use this when giving online talks. It lets me put myself on top of
 slides, in any position (including full screen).
 
-## Demo
-
-[Live Demo](https://thomas.weinert.info/reveal-embed-video/docs/example/index.html)
+ * [Documentation](https://thomas.weinert.info/reveal-embed-video/docs/)
+ * [Live Demo](https://thomas.weinert.info/reveal-embed-video/example/index.html)
 
 
 ## Usage
