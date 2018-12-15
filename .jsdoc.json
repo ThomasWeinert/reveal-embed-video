@@ -13,7 +13,10 @@
     ],
     "templates": {
         "cleverLinks": true,
-        "monospaceLinks": true
+        "monospaceLinks": true,
+        "latodoc" : {
+          "includeDate": false
+        }
     },
     "opts": {
         "destination": "./docs/",

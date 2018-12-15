@@ -31,6 +31,6 @@
     "url": "https://github.com/ThomasWeinert/reveal-embed-video/issues"
   },
   "devDependencies": {
-    "latodoc": "github:smeijer/latodoc"
+    "latodoc": "github:thomasweinert/latodoc#feature/disable-date"
   }
 }
