@@ -264,9 +264,17 @@ footer {
   color: #aaa;
 }
 
-.name, .signature {
+.signature {
   font-family: 'Source Code Pro';
   font-size: 80%;
+}
+
+.name {
+  font-family: 'Source Code Pro';
+  font-size: 110%;
+  font-weight: bold;
+  color: #333399;
+  padding-top: 30px;
 }
 
 .details {

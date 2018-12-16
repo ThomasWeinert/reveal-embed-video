@@ -29,20 +29,20 @@
      */
     this._video = video;
     /**
-     * @type {?(MediaStream|MediaSource|Blob|File)}
+     * @type {boolean}
      * @private
      */
-    this._stream = null;
+    this._persistent = persistent;
     /**
      * @type {EmbedVideo.LiveStream.STATUS}
      * @private
      */
     this._status = LiveStream.STATUS.DISABLED;
     /**
-     * @type {boolean}
+     * @type {?(MediaStream|MediaSource|Blob|File)}
      * @private
      */
-    this._persistent = persistent;
+    this._stream = null;
     /**
      * @type {string[]}
      * @private
@@ -93,17 +93,15 @@
 
   /**
    * Stop video stream and disable video
-   * @returns {void}
    */
   LiveStream.prototype.stop = function () {
-    if (this._status === LiveStream.STATUS.ACTIVE) {
-      this._destroy();
+    if (this.isActive()) {
+      this._disable();
     }
   };
 
   /**
    * Switch to the next video device
-   * @returns {void}
    */
   LiveStream.prototype.next = function () {
     var deviceId = null;
@@ -120,15 +118,9 @@
       }
     }
     if (deviceId && deviceId !== this._currentDeviceId) {
+      // noinspection JSUnusedGlobalSymbols
       this._currentDeviceId = deviceId;
-      if (this._stream) {
-        this._stream.getTracks().forEach(
-          function (track) {
-            track.stop();
-          }
-        );
-        this._stream = null;
-      }
+      this._destroy();
       if (this.isActive()) {
         this._create();
       }
@@ -138,7 +130,6 @@
   /**
    * Activate video after Reveal is ready, wait with video activation until then
    * @private
-   * @returns {void}
    */
   LiveStream.prototype._enable = function () {
     var video;
@@ -146,7 +137,7 @@
       Reveal.addEventListener(
         'ready',
         /**
-         * @memberof EmbedVideo.LiveStream.prototype
+         * @this EmbedVideo.LiveStream
          */
         function () {
           this._enable()
@@ -162,6 +153,7 @@
       if (!video.playing) {
         video.play();
       }
+      // noinspection JSUnusedGlobalSymbols
       this._status = LiveStream.STATUS.ACTIVE;
     }
   };
@@ -169,15 +161,16 @@
   /**
    * Fetch device list and create user media stream
    * @private
-   * @returns {void}
    */
   LiveStream.prototype._create = function () {
     var constraints = {
       audio: false,
       video: true
     };
+    // noinspection JSUnusedGlobalSymbols
     this._status = LiveStream.STATUS.PENDING;
     if (null === this._devices) {
+      // noinspection JSUnusedGlobalSymbols
       this._devices = [];
       navigator
         .mediaDevices
@@ -185,7 +178,7 @@
         .then(
           /**
            * @param {Array.<MediaStream|MediaSource|Blob|File>} devices
-           * @memberof EmbedVideo.LiveStream.prototype
+           * @this EmbedVideo.LiveStream
            */
           function (devices) {
             for (var i = 0, c = devices.length; i < c; i++) {
@@ -204,7 +197,7 @@
       .getUserMedia(constraints)
       .then(
         /**
-         * @memberof EmbedVideo.LiveStream.prototype
+         * @this EmbedVideo.LiveStream
          */
         function (stream) {
           this._stream = stream;
@@ -214,7 +207,7 @@
       )
       .catch(
         /**
-         * @memberof EmbedVideo.LiveStream.prototype
+         * @this EmbedVideo.LiveStream
          */
         function (error) {
           console.log('getUserMedia error: ', error);
@@ -226,9 +219,8 @@
   /**
    * Pause video, remove enabled status and stop stream
    * @private
-   * @returns {void}
    */
-  LiveStream.prototype._destroy = function () {
+  LiveStream.prototype._disable = function () {
     var video = this._video;
     if (video instanceof HTMLVideoElement) {
       if (video.playing) {
@@ -237,16 +229,27 @@
       video.srcObject = null;
       video.removeAttribute('data-enabled');
       video.load();
-      if (this._stream && !this._persistent) {
-        this._stream.getTracks().forEach(
-          function (track) {
-            track.stop();
-          }
-        );
-        this._stream = null;
+      if (!this._persistent) {
+        this._destroy();
       }
     }
+    // noinspection JSUnusedGlobalSymbols
     this._status = LiveStream.STATUS.DISABLED;
+  };
+
+  /**
+   * @private
+   */
+  LiveStream.prototype._destroy = function() {
+    if (this._stream) {
+      this._stream.getTracks().forEach(
+        function (track) {
+          track.stop();
+        }
+      );
+      // noinspection JSUnusedGlobalSymbols
+      this._stream = null;
+    }
   };
 
   /**
@@ -255,19 +258,28 @@
    * @memberOf EmbedVideo
    */
   var Plugin = function (options) {
-    var style, onUpdateRequired;
+    var style;
+    var _isEnabled = options.enabled;
+
     /**
-     * Plugin be enabled
-     * @type {boolean}
-     * @private
+     * is video the video display enabled
+     * @returns {boolean}
      */
-    this._isEnabled = options.enabled;
+    this.isEnabled = function() {
+      return _isEnabled;
+    };
+
     /**
-     * Keyboard shortcut registered
-     * @type {boolean}
-     * @private
+     * enabled/disable the video display
+     * @method
+     * @returns {boolean}
      */
-    this._isRegistered = false;
+    this.toggle = function() {
+      _isEnabled = !_isEnabled;
+      this.update();
+      return _isEnabled;
+    }.bind(this);
+
     /**
      * CSS class to identify the video element (avoid conflicts with other videos)
      * @type {string}
@@ -285,7 +297,7 @@
     this._video.addEventListener(
       'click',
       /**
-       * @memberof EmbedVideo.LiveStream.prototype
+       * @this EmbedVideo.Plugin
        */
       function () {
         this._stream.next();
@@ -302,47 +314,35 @@
     style.href = options.path + '/reveal-embed-video.css';
     document.querySelector('head').appendChild(style);
 
-    /**
-     * @memberOf EmbedVideo.Plugin.prototype
-     */
-    onUpdateRequired = function () {
-      this.update();
-    }.bind(this);
-    Reveal.addEventListener('ready', onUpdateRequired);
-    Reveal.addEventListener('slidechanged', onUpdateRequired);
+    Reveal.addEventListener(
+      'ready',
+      /**
+       * @this EmbedVideo.Plugin
+       */
+      function() {
+        Reveal.registerKeyboardShortcut('C', 'Toggle speaker camera');
+        Reveal.configure(
+          {
+            keyboard: {
+              67: this.toggle.bind(this)
+            }
+          }
+        );
+      }.bind(this)
+    );
+    Reveal.addEventListener(
+      'slidechanged',
+      this.update.bind(this)
+    );
   };
 
   /**
-   * Toggle the plugin between enabled/disabled
-   * @returns {boolean}
-   */
-  Plugin.prototype.toggle = function () {
-    this.update(this._isEnabled = !this._isEnabled);
-    return this._isEnabled;
-  };
-
-  /**
-   * Update plugin status in DOM and Reveal
-   *
-   * Registers the Key `C` (camera) to enable/disable the plugin
-   *
-   * @returns {void}
+   * Update plugin status in DOM
    */
   Plugin.prototype.update = function () {
     var newVideoClass, enable;
-    if (!this._isRegistered) {
-      this._isRegistered = true;
-      Reveal.registerKeyboardShortcut('C', 'Toggle speaker camera');
-      Reveal.configure(
-        {
-          keyboard: {
-            67: this.toggle.bind(this)
-          }
-        }
-      );
-    }
     newVideoClass = this.getVideoClass(Reveal.getCurrentSlide());
-    enable = this._isEnabled && newVideoClass;
+    enable = this.isEnabled() && newVideoClass;
     if (this._stream.isActive() && !enable) {
       this._video.setAttribute('class', this._identfierClass);
       this._stream.stop();
@@ -421,5 +421,4 @@
   options.path = options.path || getScriptPath() || 'plugin/reveal-embed-video';
 
   new Plugin(options);
-
 })();
